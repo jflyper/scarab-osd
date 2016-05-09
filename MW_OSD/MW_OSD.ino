@@ -121,11 +121,17 @@ void setup()
 {
 
   Serial.begin(BAUDRATE);
+#ifndef ASMCLEANUP
+// The original Serial.begin() should generate the same clock,
+// except for the 57600 case which doesn't use the U2X for
+// better compatibility with old(?) bootloaders.
+// 
 //---- override UBRR with MWC settings
   uint8_t h = ((F_CPU  / 4 / (BAUDRATE) -1) / 2) >> 8;
   uint8_t l = ((F_CPU  / 4 / (BAUDRATE) -1) / 2);
   UCSR0A  |= (1<<U2X0); UBRR0H = h; UBRR0L = l; 
 //---
+#endif
   Serial.flush();
 
   pinMode(PWMRSSIPIN, INPUT);
@@ -655,9 +661,25 @@ int16_t getNextCharToRequest() {
 //------------------------------------------------------------------------
 // MISC
 
+// Resetting has extremely strong dependency on platforms.
 void resetFunc(void)
 {
+#ifndef ASMCLEANUP
   asm volatile ("  jmp 0"); 
+#else
+
+#if defined(__AVR)
+  asm volatile ("  jmp 0"); 
+#endif
+
+#if defined(__arm__) && defined(CORE_TEENSY)
+#define RESTART_ADDR       0xE000ED0C
+#define READ_RESTART()     (*(volatile uint32_t *)RESTART_ADDR)
+#define WRITE_RESTART(val) ((*(volatile uint32_t *)RESTART_ADDR) = (val))
+  WRITE_RESTART(0x5FA0004);
+#endif
+
+#endif // ASMCLEANUP
 } 
 
 void setMspRequests() {

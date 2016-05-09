@@ -210,9 +210,13 @@ void MAX7456Setup(void)
   digitalWrite(MAX7456SELECT,HIGH);
   delay(100);
 # ifdef USE_VSYNC
+#ifndef ASMCLEANUP
   EIMSK |= (1 << INT0);  // enable interuppt
   EICRA |= (1 << ISC01); // interrupt at the falling edge
   sei();
+#else
+  attachInterrupt(digitalPinToInterrupt(VSYNC), isr_VSYNC, FALLING);
+#endif
 #endif
 }
 
@@ -239,9 +243,17 @@ void MAX7456_WriteString_P(const char *string, int Adresse)
 
 #ifdef USE_VSYNC
   volatile unsigned char vsync_wait = 0;
+
+# ifndef ASMCLEANUP
   ISR(INT0_vect) {
     vsync_wait = 0;
   }
+# else
+void isr_VSYNC(void) {
+  vsync_wait = 0;
+}
+# endif
+
 #endif
 
 void MAX7456_DrawScreen()

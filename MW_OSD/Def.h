@@ -10,6 +10,7 @@
 //#define DEVELOPMENT   // to force layout 0, set debug default eeprombit = 1
 //#define FORCEDEBUG    // to debug display
 
+#define	ASMCLEANUP      // Try removing replacing asm() for better compatibility
 
 /*--------------------------       DEPRECATED parameters for reference only      ----------------------------------------------------*/
 
