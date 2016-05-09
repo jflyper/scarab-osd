@@ -662,6 +662,9 @@ int16_t getNextCharToRequest() {
 // MISC
 
 // Resetting has extremely strong dependency on platforms.
+// Even the original "jmp 0" method for AVR based arduinos
+// don't work for 32u4 based ones.
+
 void resetFunc(void)
 {
 #ifndef ASMCLEANUP
@@ -672,12 +675,16 @@ void resetFunc(void)
   asm volatile ("  jmp 0"); 
 #endif
 
+// Teensy 3 & LC
+// https://forum.pjrc.com/threads/19959-Detect-Teensy-3-C-preprocessor
 #if defined(__arm__) && defined(CORE_TEENSY)
-#define RESTART_ADDR       0xE000ED0C
-#define READ_RESTART()     (*(volatile uint32_t *)RESTART_ADDR)
-#define WRITE_RESTART(val) ((*(volatile uint32_t *)RESTART_ADDR) = (val))
-  WRITE_RESTART(0x5FA0004);
-#endif
+// Reset code: post#21 of
+// https://forum.pjrc.com/threads/24304-_reboot_Teensyduino()-vs-_restart_Teensyduino()
+#define CPU_RESTART_ADDR (uint32_t *)0xE000ED0C
+#define CPU_RESTART_VAL 0x5FA0004
+#define CPU_RESTART (*CPU_RESTART_ADDR = CPU_RESTART_VAL)
+
+  CPU_RESTART;
 
 #endif // ASMCLEANUP
 } 
