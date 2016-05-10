@@ -215,7 +215,13 @@ void MAX7456Setup(void)
   EICRA |= (1 << ISC01); // interrupt at the falling edge
   sei();
 #else
+# if defined(__arm__) && defined(CORE_TEENSY)
+  // Teensy uses pin numbers directly (not INT numbers).
+  attachInterrupt(VSYNC, isr_VSYNC, FALLING);
+#else
   attachInterrupt(digitalPinToInterrupt(VSYNC), isr_VSYNC, FALLING);
+#endif
+
 #endif
 #endif
 }
