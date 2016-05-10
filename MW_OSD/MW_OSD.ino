@@ -153,6 +153,10 @@ void setup()
   #endif
   delay(STARTUPDELAY);
  
+// Watch out.
+// Some ATmega don't have INTERAL, but INTERNAL1V1 (1.1V ofcourse) instead.
+// Teensy 3 has 1.2V INTERNAL reference.
+// Teensy LC does not have INTERNAL reference.
   if (Settings[S_VREFERENCE])
     analogReference(DEFAULT);
   else
