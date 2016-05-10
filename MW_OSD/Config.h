@@ -1,6 +1,10 @@
 /*--------------------------       MANDATORY configurable parameters      ----------------------------------------------------*/
 /*--------------------------       MANDATORY configurable parameters      ----------------------------------------------------*/
 
+// Teensy 3.1, and may be Leonardo
+#define	SERIAL	Serial1
+#define USBPORT Serial
+
 /********************       OSD HARDWARE settings      *********************/
 //Choose ONLY ONE option:
 #define MINIMOSD                    // Uncomment this if using standard MINIMOSD hardware

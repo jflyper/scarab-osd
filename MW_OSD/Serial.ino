@@ -43,9 +43,9 @@ uint8_t read8()  {
 
 void mspWriteRequest(uint8_t mspCommand, uint8_t txDataSize){
   //return;
-  Serial.write('$');
-  Serial.write('M');
-  Serial.write('<');
+  SERIAL.write('$');
+  SERIAL.write('M');
+  SERIAL.write('<');
   txChecksum = 0;
   mspWrite8(txDataSize);
   mspWrite8(mspCommand);
@@ -54,7 +54,7 @@ void mspWriteRequest(uint8_t mspCommand, uint8_t txDataSize){
 }
 
 void mspWrite8(uint8_t t){
-  Serial.write(t);
+  SERIAL.write(t);
   txChecksum ^= t;
 }
 
@@ -71,7 +71,7 @@ void mspWrite32(uint32_t t){
 }
 
 void mspWriteChecksum(){
-  Serial.write(txChecksum);
+  SERIAL.write(txChecksum);
 }
 
 // --------------------------------------------------------------------------------------
@@ -861,10 +861,10 @@ void serialMSPreceive(uint8_t loops)
   }
   c_state = IDLE;
 
-  if (Serial.available()) loopserial=1;
+  if (SERIAL.available()) loopserial=1;
   while(loopserial==1)
   {
-    c = Serial.read();
+    c = SERIAL.read();
 
     #ifdef GPSOSD    
       armedtimer = 0;
@@ -929,7 +929,7 @@ void serialMSPreceive(uint8_t loops)
         serialBuffer[receiverIndex++]=c;
     }
     if (loops==0) loopserial=0;
-    if (!Serial.available()) loopserial=0;
+    if (!SERIAL.available()) loopserial=0;
   }
 }
 
