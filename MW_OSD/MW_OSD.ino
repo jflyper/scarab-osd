@@ -689,6 +689,7 @@ void resetFunc(void)
 #define CPU_RESTART (*CPU_RESTART_ADDR = CPU_RESTART_VAL)
 
   CPU_RESTART;
+#endif // __arm__ && CORE_TEENSY
 
 #endif // ASMCLEANUP
 } 
