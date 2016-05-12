@@ -2,8 +2,8 @@
 /*--------------------------       MANDATORY configurable parameters      ----------------------------------------------------*/
 
 // Teensy 3.1, and may be Leonardo
-#define	SERIAL	Serial1
-#define USBPORT Serial
+#define	DATAPORT Serial1
+#define CFGPORT  Serial
 
 /********************       OSD HARDWARE settings      *********************/
 //Choose ONLY ONE option:

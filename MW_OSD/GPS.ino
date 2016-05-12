@@ -47,7 +47,7 @@
 //  void SerialGpsPrint(char str) {
     char b;
     while(str && (b = pgm_read_byte(str++))) {
-      SERIAL.write(b); 
+      DATAPORT.write(b); 
       #if defined(UBLOX)
         delay(5);
       #endif      
@@ -76,8 +76,8 @@
     #if defined(UBLOX)
       for(uint8_t i=0;i<5;i++){
         delay(100);
-        SERIAL.begin(init_speed[i]);  
-        SERIAL.flush();
+        DATAPORT.begin(init_speed[i]);  
+        DATAPORT.flush();
        #if (GPS_BAUD==19200)
           SerialGpsPrint(PSTR("$PUBX,41,1,0003,0001,19200,0*23\r\n"));     // 19200 baud - minimal speed for 5Hz update rate
         #endif  
@@ -91,18 +91,18 @@
           SerialGpsPrint(PSTR("$PUBX,41,1,0003,0001,115200,0*1E\r\n"));    // 115200 baud
         #endif  
       }
-      SERIAL.flush();
+      DATAPORT.flush();
       delay(100);
-      SERIAL.begin(GPS_BAUD);  
+      DATAPORT.begin(GPS_BAUD);  
       for(uint8_t i=0; i<sizeof(UBLOX_INIT); i++) {                        // send configuration data in UBX protocol
-        SERIAL.write(pgm_read_byte(UBLOX_INIT+i));
+        DATAPORT.write(pgm_read_byte(UBLOX_INIT+i));
         delay(5); //simulating a 38400baud pace (or less), otherwise commands are not accepted by the device.
       }
     #elif defined(INIT_MTK_GPS)                                            // MTK GPS setup
       for(uint8_t i=0;i<5;i++){
-        SERIAL.flush();
+        DATAPORT.flush();
         delay(100);
-        SERIAL.begin(init_speed[i]);            
+        DATAPORT.begin(init_speed[i]);            
         #if (GPS_BAUD==19200)
           SerialGpsPrint(PSTR("$PMTK251,19200*22\r\n"));     // 19200 baud - minimal speed for 5Hz update rate
         #endif  
@@ -118,42 +118,42 @@
       }
       // at this point we have GPS working at selected (via #define GPS_BAUD) baudrate
       // So now we have to set the desired mode and update rate (which depends on the NMEA or MTK_BINARYxx settings)
-      SERIAL.flush();
+      DATAPORT.flush();
       delay(100);
-      SERIAL.begin(GPS_BAUD);
+      DATAPORT.begin(GPS_BAUD);
 
-      SERIAL.flush();
+      DATAPORT.flush();
       delay(100);
       SerialGpsPrint(MTK_NAVTHRES_OFF);
-      SERIAL.flush();
+      DATAPORT.flush();
       delay(100);
       SerialGpsPrint(SBAS_ON);
-      SERIAL.flush();
+      DATAPORT.flush();
       delay(100);
       SerialGpsPrint(WAAS_ON);
-      SERIAL.flush();
+      DATAPORT.flush();
       delay(100);
       SerialGpsPrint(SBAS_TEST_MODE);
-      SERIAL.flush();
+      DATAPORT.flush();
       delay(100);
       SerialGpsPrint(MTK_OUTPUT_5HZ);           // 5 Hz update rate
-      SERIAL.flush();
+      DATAPORT.flush();
       delay(100);
 
       #if defined(NMEA)
         SerialGpsPrint(MTK_SET_NMEA_SENTENCES); // only GGA and RMC sentence
-      SERIAL.flush();
+      DATAPORT.flush();
       delay(100);
       #endif     
       #if defined(MTK_BINARY19) || defined(MTK_BINARY16)
         SerialGpsPrint(MTK_SET_BINARY);
-        SERIAL.flush();
+        DATAPORT.flush();
         delay(100);
       #endif
     #elif defined(NMEA)                              // NMEA only
-      SERIAL.flush();
+      DATAPORT.flush();
       delay(100);
-      SERIAL.begin(GPS_BAUD);  
+      DATAPORT.begin(GPS_BAUD);  
     #endif  // init gps type 
   }
 

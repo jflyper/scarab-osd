@@ -61,7 +61,7 @@ void mav_tx_checksum_func(int val) {
 
 void mav_serialize8(uint8_t val) {
   mav_tx_checksum_func(val);
-  SERIAL.write(val);
+  DATAPORT.write(val);
 }
 
 
@@ -74,7 +74,7 @@ void mav_serialize16(uint16_t val) {
 void mavlink_msg_request_data_stream_send(uint8_t MAVStreams, uint16_t MAVRates){
   //head:
   mw_mav.tx_checksum=0xFFFF; //init
-  SERIAL.write(0xFE);
+  DATAPORT.write(0xFE);
   mav_serialize8(mw_mav.message_length);
   mav_serialize8(mw_mav.sequence&0xFF);
   mav_serialize8(99);
@@ -88,8 +88,8 @@ void mavlink_msg_request_data_stream_send(uint8_t MAVStreams, uint16_t MAVRates)
   mav_serialize8(1);
   //tail:
   mav_checksum(MAVLINK_MSG_ID_REQUEST_DATA_STREAM_MAGIC);
-  SERIAL.write((uint8_t)(mw_mav.serial_checksum&0xFF));
-  SERIAL.write((uint8_t)(mw_mav.serial_checksum>>8&0xFF));
+  DATAPORT.write((uint8_t)(mw_mav.serial_checksum&0xFF));
+  DATAPORT.write((uint8_t)(mw_mav.serial_checksum>>8&0xFF));
 }
 
 

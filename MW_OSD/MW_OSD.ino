@@ -120,7 +120,7 @@ boolean ledstatus=HIGH;
 void setup()
 {
 
-  SERIAL.begin(BAUDRATE);
+  DATAPORT.begin(BAUDRATE);
 #ifndef ASMCLEANUP
 // The original Serial.begin() should generate the same clock,
 // except for the 57600 case which doesn't use the U2X for
@@ -132,7 +132,7 @@ void setup()
   UCSR0A  |= (1<<U2X0); UBRR0H = h; UBRR0L = l; 
 //---
 #endif
-  SERIAL.flush();
+  DATAPORT.flush();
 
   pinMode(PWMRSSIPIN, INPUT);
   pinMode(RSSIPIN, INPUT);

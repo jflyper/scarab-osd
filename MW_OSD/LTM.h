@@ -61,7 +61,7 @@ void mav_tx_checksum_func(int val) {
 
 void mav_serialize8(uint8_t val) {
   mav_tx_checksum_func(val);
-  SERIAL.write(val);
+  DATAPORT.write(val);
 }
 
 
@@ -74,7 +74,7 @@ void mav_serialize16(uint16_t val) {
 void mavlink_msg_request_data_stream_send(uint8_t MAVStreams, uint16_t MAVRates){
   //head:
   mw_mav.tx_checksum=0xFFFF; //init
-  SERIAL.write(0xFE);
+  DATAPORT.write(0xFE);
   mav_serialize8(mw_mav.message_length);
   mav_serialize8(mw_mav.sequence&0xFF);
   mav_serialize8(99);
@@ -88,8 +88,8 @@ void mavlink_msg_request_data_stream_send(uint8_t MAVStreams, uint16_t MAVRates)
   mav_serialize8(1);
   //tail:
   mav_checksum(MAVLINK_MSG_ID_REQUEST_DATA_STREAM_MAGIC);
-  SERIAL.write((uint8_t)(mw_mav.serial_checksum&0xFF));
-  SERIAL.write((uint8_t)(mw_mav.serial_checksum>>8&0xFF));
+  DATAPORT.write((uint8_t)(mw_mav.serial_checksum&0xFF));
+  DATAPORT.write((uint8_t)(mw_mav.serial_checksum>>8&0xFF));
 }
 
 
@@ -487,15 +487,15 @@ void readTelemetry() {
 
     uavData.flagTelemetryOk = ((millis() - lastLTMpacket) < 500) ? 1 : 0;
 
-    while (SERIAL.available()) {
-        c = char(SERIAL.read());
+    while (DATAPORT.available()) {
+        c = char(DATAPORT.read());
         if (c_state == IDLE) {
             c_state = (c == '$') ? HEADER_START1 : IDLE;
-            //SERIAL.println("header $" );
+            //DATAPORT.println("header $" );
         }
         else if (c_state == HEADER_START1) {
             c_state = (c == 'T') ? HEADER_START2 : IDLE;
-            //SERIAL.println("header T" );
+            //DATAPORT.println("header T" );
         }
         else if (c_state == HEADER_START2) {
             switch (c) {
