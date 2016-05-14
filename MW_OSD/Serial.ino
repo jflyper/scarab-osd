@@ -41,7 +41,38 @@ uint8_t read8()  {
   return serialBuffer[readIndex++];
 }
 
+void streamWriteRequest(Stream *port, uint8_t mspCommand, uint8_t txDataSize){
+  port->write("$M<");
+  txChecksum = 0;
+  streamWrite8(port, txDataSize);
+  streamWrite8(port, mspCommand);
+  if(txDataSize == 0)
+    streamWriteChecksum(port);
+}
+
+void streamWrite8(Stream *port, uint8_t t){
+  port->write(t);
+  txChecksum ^= t;
+}
+
+void streamWrite16(Stream *port, uint16_t t){
+  streamWrite8(port, t);
+  streamWrite8(port, t>>8);
+}
+
+void streamWrite32(Stream *port, uint32_t t){
+  streamWrite16(port, t);
+  streamWrite16(port, t>>16);
+}
+
+void streamWriteChecksum(Stream *port){
+  port->write(txChecksum);
+}
+
 void mspWriteRequest(uint8_t mspCommand, uint8_t txDataSize){
+#ifdef HASCFGPORT
+  streamWriteRequest(&DATAPORT, mspCommand, txDataSize);
+#else
   //return;
   DATAPORT.write('$');
   DATAPORT.write('M');
@@ -51,28 +82,73 @@ void mspWriteRequest(uint8_t mspCommand, uint8_t txDataSize){
   mspWrite8(mspCommand);
   if(txDataSize == 0)
     mspWriteChecksum();
+#endif
 }
 
 void mspWrite8(uint8_t t){
+#ifdef HASCFGPORT
+  streamWrite8(&DATAPORT, t);
+#else
   DATAPORT.write(t);
   txChecksum ^= t;
+#endif
 }
 
 void mspWrite16(uint16_t t){
+#ifdef HASCFGPORT
+  streamWrite16(&DATAPORT, t);
+#else
   mspWrite8(t);
   mspWrite8(t>>8);
+#endif
 }
 
 void mspWrite32(uint32_t t){
+#ifdef HASCFGPORT
+  streamWrite32(&DATAPORT, t);
+#else
   mspWrite8(t);
   mspWrite8(t>>8);
   mspWrite8(t>>16);
   mspWrite8(t>>24);
+#endif
 }
 
 void mspWriteChecksum(){
+#ifdef HASCFGPORT
+  streamWriteChecksum(&DATAPORT);
+#else
   DATAPORT.write(txChecksum);
+#endif
 }
+
+#ifdef HASCFGPORT
+void cfgWriteRequest(uint8_t mspCommand, uint8_t txDataSize){
+  streamWriteRequest(&CFGPORT, mspCommand, txDataSize);
+}
+
+void cfgWrite8(uint8_t t){
+  streamWrite8(&CFGPORT, t);
+}
+
+void cfgWrite16(uint16_t t){
+  streamWrite16(&CFGPORT, t);
+}
+
+void cfgWrite32(uint32_t t){
+  streamWrite32(&CFGPORT, t);
+}
+
+void cfgWriteChecksum(){
+  streamWriteChecksum(&CFGPORT);
+}
+#else
+# define cfgWriteRequest mspWriteRequest
+# define cfgWrite8 mspWrite8
+# define cfgWrite16 mspWrite16
+# define cfgWrite32 mspWrite32
+# define cfgWriteChecksum mspWriteChecksum
+#endif
 
 // --------------------------------------------------------------------------------------
 // Here are decoded received commands from MultiWii
@@ -115,14 +191,14 @@ void serialMSPCheck()
     }
 #ifdef GUISENSORS
     if (cmd == OSD_SENSORS) {
-      mspWriteRequest(MSP_OSD,1+10);
-      mspWrite8(OSD_SENSORS);
+      cfgWriteRequest(MSP_OSD,1+10);
+      cfgWrite8(OSD_SENSORS);
       for (uint8_t sensor=0;sensor<SENSORTOTAL;sensor++) {
 //        uint16_t sensortemp = analogRead(sensorpinarray[sensor]);
         uint16_t sensortemp = (uint16_t)sensorfilter[sensor][SENSORFILTERSIZE]/SENSORFILTERSIZE;
-        mspWrite16(sensortemp);
+        cfgWrite16(sensortemp);
       }
-       mspWriteChecksum();
+       cfgWriteChecksum();
     }
 #endif
 
@@ -861,10 +937,42 @@ void serialMSPreceive(uint8_t loops)
   }
   c_state = IDLE;
 
-  if (DATAPORT.available()) loopserial=1;
+  static Stream *focusPort = NULL;
+
+  // Always reset the focusPort if IDLE
+  if (c_state == IDLE)
+    focusPort = NULL;
+
+  // If focusPort is active, then check it.
+  // If not, check each port for the first char.
+  if (focusPort && focusPort->available()) {
+    loopserial = 1;
+  } else {
+    if (DATAPORT.available()) {
+      focusPort = &DATAPORT;
+      loopserial = 1;
+    }
+#ifdef HASCFGPORT
+    else if (CFGPORT.available()) {
+      focusPort = &CFGPORT;
+      loopserial = 1;
+    }
+#endif
+#ifdef HASI2CPORT
+    else if (I2CPORT.available()) {
+      focusPort = & I2CPORT;
+      loopserial = 1;
+    }
+#endif
+  }
+
+  // Residual from simple code, for resurrection.
+  //if (DATAPORT.available()) loopserial=1;
+
   while(loopserial==1)
   {
-    c = DATAPORT.read();
+    //c = DATAPORT.read();
+    c = focusPort->read();
 
     #ifdef GPSOSD    
       armedtimer = 0;
@@ -929,7 +1037,8 @@ void serialMSPreceive(uint8_t loops)
         serialBuffer[receiverIndex++]=c;
     }
     if (loops==0) loopserial=0;
-    if (!DATAPORT.available()) loopserial=0;
+    //if (!DATAPORT.available()) loopserial=0;
+    if (!focusPort->available()) loopserial=0;
   }
 }
 
@@ -1052,29 +1161,29 @@ void configSave()
 }
 
 void fontSerialRequest() {
-  mspWriteRequest(MSP_OSD,3);
-  mspWrite8(OSD_GET_FONT);
-  mspWrite16(getNextCharToRequest());
-  mspWriteChecksum();
+  cfgWriteRequest(MSP_OSD,3);
+  cfgWrite8(OSD_GET_FONT);
+  cfgWrite16(getNextCharToRequest());
+  cfgWriteChecksum();
 }
 
 void settingsSerialRequest() {
-  mspWriteRequest(MSP_OSD,1+30);
-  mspWrite8(OSD_READ_CMD_EE);
+  cfgWriteRequest(MSP_OSD,1+30);
+  cfgWrite8(OSD_READ_CMD_EE);
   for(uint8_t i=0; i<10; i++) {
     eedata = EEPROM.read(eeaddress);
-    mspWrite16(eeaddress);
-    mspWrite8(eedata);
+    cfgWrite16(eeaddress);
+    cfgWrite8(eedata);
     eeaddress++;
   }
-  mspWriteChecksum();
+  cfgWriteChecksum();
 }
 
 void settingswriteSerialRequest() {
-  mspWriteRequest(MSP_OSD,3);
-  mspWrite8(OSD_READ_CMD_EE);
-  mspWrite16(eeaddress);
-  mspWriteChecksum();
+  cfgWriteRequest(MSP_OSD,3);
+  cfgWrite8(OSD_READ_CMD_EE);
+  cfgWrite16(eeaddress);
+  cfgWriteChecksum();
 }
 
 void setFCProfile()

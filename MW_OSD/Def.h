@@ -321,7 +321,11 @@
 #define TEMPPIN       A3  // also used for airspeed         
 #define RSSIPIN       A3              
 #define PWMRSSIPIN    A3              
+#ifdef TEENSY3
+#define LEDPIN        3
+#else
 #define LEDPIN        7
+#endif
 
 // All aircraft / FC types defaults...
 #define RESETGPSALTITUDEATARM
@@ -333,12 +337,18 @@
 
 
 /********************  OSD HARDWARE rule definitions  *********************/
+
 #ifdef RUSHDUINO                     
     # define MAX7456SELECT 10        // ss 
     # define MAX7456RESET  9         // RESET
 #else                                  
+# ifdef TEENSY3
+    # define MAX7456SELECT 6         // ss
+    # define MAX7456RESET  5        // RESET
+# else
     # define MAX7456SELECT 6         // ss
     # define MAX7456RESET  10        // RESET
+# endif
 #endif
 
 #ifdef WITESPYV1                     

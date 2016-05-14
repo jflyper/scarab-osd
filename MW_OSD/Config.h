@@ -1,9 +1,27 @@
 /*--------------------------       MANDATORY configurable parameters      ----------------------------------------------------*/
 /*--------------------------       MANDATORY configurable parameters      ----------------------------------------------------*/
 
-// Teensy 3.1, and may be Leonardo
+// Teensy 3.1/3.2
+// What about TEENSY LC?
+#if defined(__arm__) && defined(CORE_TEENSY)
+#define TEENSY3
+#endif
+
+#if defined(__AVR__ATmega32u4__)
+#define ATMEGA32U4
+#endif
+
+#if defined(TEENSY3) || defined(ATMEGA32U4)
+#define HASCFGPORT
+#endif
+
+#ifdef HASCFGPORT
 #define	DATAPORT Serial1
 #define CFGPORT  Serial
+#else
+#define	DATAPORT Serial
+#define CFGPORT  Serial
+#endif
 
 /********************       OSD HARDWARE settings      *********************/
 //Choose ONLY ONE option:
@@ -33,9 +51,9 @@
 //#define BASEFLIGHT                // Uncomment this if you are using latest BASEFLIGHT version from repository (Stable 2015.08.27 at time of this MWOSD release)
 //#define TAULABS                   // Uncomment this if you are using the latest Tau Labs MSP Module
 //#define DRONIN                    // Uncomment this if you are using the latest DRONIN MSP Module
-//#define CLEANFLIGHT               // Uncomment this if you are using latest CLEANFLIGHT version from repository (1.11.0 at time of this MWOSD release)
+#define CLEANFLIGHT               // Uncomment this if you are using latest CLEANFLIGHT version from repository (1.11.0 at time of this MWOSD release)
 //#define BETAFLIGHT                // Uncomment this if you are using BETAFLIGHT (same as CLEANFLIGHT t time of this MWOSD release)
-#define FIXEDWING_BF              // Uncomment this if you are using fixed wing Baseflight 
+//#define FIXEDWING_BF              // Uncomment this if you are using fixed wing Baseflight 
 //#define HARAKIRI                  // Uncomment this if you are using HARAKIRI (for BOXNAMES compatibility)
 //#define NAZA                      // Uncomment this if you are using NAZA flight controller
 //#define iNAV                      // Uncomment this if you are using latest iNAV version from repository (1.01 at time of this MWOSD release)
