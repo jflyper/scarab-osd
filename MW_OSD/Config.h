@@ -114,7 +114,7 @@
 /********************       RSSI settings (PWM/PPM)      *********************/
 //Choose ONLY ONE option: 
 //Note all require PWM RSSI to be enabled on GUI
-//#define INTPWMRSSI                  // Undefine this to use new interrupt PWM RSSI method (standard PWM 0-2000ms pulse width)
+#define INTPWMRSSI                  // Undefine this to use new interrupt PWM RSSI method (standard PWM 0-2000ms pulse width)
 // PWM based RSSI is temporary disabled for ASMCLEANUP (uses h/w regs)
 //#define PULSEINPWMRSSI            // DEPRECATED Undefine this to use legacy non interrupt PWM RSSI method (pulse width 0 - 2000ms pulse width)
 //#define FASTPWMRSSI               // Undefine this to use high PWM refresh frequency RSSI (greataer than standard 50 hz)

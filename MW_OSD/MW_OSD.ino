@@ -1108,6 +1108,12 @@ unsigned long FastpulseIn(uint8_t pin, uint8_t state, unsigned long timeout)
 }
 
 #if defined INTPWMRSSI
+
+#ifdef TEENSY3
+void initRSSIint() {
+  attachInterrupt(PWMRSSIPIN, isr_PWMRSSI, CHANGE);
+}
+#else
 void initRSSIint() { // enable ONLY RSSI pin A3 for interrupt (bit 3 on port C)
   DDRC &= ~(1 << DDC3);
 //  PORTC |= (1 << PORTC3);
@@ -1116,28 +1122,49 @@ void initRSSIint() { // enable ONLY RSSI pin A3 for interrupt (bit 3 on port C)
   PCMSK1 = (1 << PCINT11);
   sei();
 }
+#endif
 
-
+#ifdef TEENSY3
+void isr_PWMRSSI(void) { //
+#else
 ISR(PCINT1_vect) { //
+#endif
   static uint16_t PulseStart;  
   static uint8_t PulseCounter;  
+#ifdef TEENSY3
+  uint8_t pinstatus;
+  pinstatus = digitalRead(PWMRSSIPIN);
+#else
   uint8_t pinstatus;
   pinstatus = PINC;
+#endif
   sei();
   uint16_t CurrentTime;
   uint16_t PulseDuration;
   CurrentTime = micros();
+#ifdef TEENSY3
+  if (!pinstatus) {
+#else
   if (!(pinstatus & (1<<DDC3))) { // RSSI pin A3 - ! measures low duration
+#endif
     if (PulseCounter >1){ // why? - to skip any partial pulse due to toggling of int's
       PulseDuration = CurrentTime-PulseStart; 
       PulseCounter=0;
     #if defined FASTPWMRSSI
       pwmRSSI = PulseDuration;
-      PCMSK1 =0;
+      #ifdef TEENSY3
+        detachInterrupt(PWMRSSIPIN);
+      #else
+        PCMSK1 =0;
+      #endif
     #else
       if ((750<PulseDuration) && (PulseDuration<2250)) {
         pwmRSSI = PulseDuration;
-        PCMSK1 =0;
+        #ifdef TEENSY3
+          detachInterrupt(PWMRSSIPIN);
+        #else
+          PCMSK1 =0;
+        #endif
       }
     #endif 
     }
