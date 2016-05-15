@@ -18,9 +18,11 @@
 #ifdef HASCFGPORT
 #define	DATAPORT Serial1
 #define CFGPORT  Serial
+//#define MSP2CFG
 #else
 #define	DATAPORT Serial
 #define CFGPORT  Serial
+#undef MSP2CFG	// Paranoia; don't send things twice!
 #endif
 
 /********************       OSD HARDWARE settings      *********************/

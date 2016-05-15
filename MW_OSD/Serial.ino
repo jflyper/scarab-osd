@@ -71,6 +71,9 @@ void streamWriteChecksum(Stream *port){
 
 void mspWriteRequest(uint8_t mspCommand, uint8_t txDataSize){
 #ifdef HASCFGPORT
+# ifdef MSP2CFG
+  streamWriteRequest(&CFGPORT, mspCommand, txDataSize);
+# endif
   streamWriteRequest(&DATAPORT, mspCommand, txDataSize);
 #else
   //return;
@@ -87,6 +90,9 @@ void mspWriteRequest(uint8_t mspCommand, uint8_t txDataSize){
 
 void mspWrite8(uint8_t t){
 #ifdef HASCFGPORT
+# ifdef MSP2CFG
+  streamWrite8(&CFGPORT, t);
+# endif
   streamWrite8(&DATAPORT, t);
 #else
   DATAPORT.write(t);
@@ -96,6 +102,9 @@ void mspWrite8(uint8_t t){
 
 void mspWrite16(uint16_t t){
 #ifdef HASCFGPORT
+# ifdef MSP2CFG
+  streamWrite16(&CFGPORT, t);
+# endif
   streamWrite16(&DATAPORT, t);
 #else
   mspWrite8(t);
@@ -105,6 +114,9 @@ void mspWrite16(uint16_t t){
 
 void mspWrite32(uint32_t t){
 #ifdef HASCFGPORT
+# ifdef MSP2CFG
+  streamWrite32(&CFGPORT, t);
+# endif
   streamWrite32(&DATAPORT, t);
 #else
   mspWrite8(t);
@@ -116,6 +128,9 @@ void mspWrite32(uint32_t t){
 
 void mspWriteChecksum(){
 #ifdef HASCFGPORT
+# ifdef MSP2CFG
+  streamWriteChecksum(&CFGPORT);
+# endif
   streamWriteChecksum(&DATAPORT);
 #else
   DATAPORT.write(txChecksum);
@@ -143,6 +158,8 @@ void cfgWriteChecksum(){
   streamWriteChecksum(&CFGPORT);
 }
 #else
+// If don't have a CFGPORT, then all cfgWrite*()
+// will goto corresponding mspWrite*().
 # define cfgWriteRequest mspWriteRequest
 # define cfgWrite8 mspWrite8
 # define cfgWrite16 mspWrite16
