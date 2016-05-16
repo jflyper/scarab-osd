@@ -1,6 +1,7 @@
 /*--------------------------       MANDATORY configurable parameters      ----------------------------------------------------*/
 /*--------------------------       MANDATORY configurable parameters      ----------------------------------------------------*/
 
+/********************       Platform definitions      *********************/
 // Teensy 3.1/3.2
 // What about TEENSY LC?
 #if defined(__arm__) && defined(CORE_TEENSY)
@@ -18,7 +19,7 @@
 #ifdef HASCFGPORT
 #define	DATAPORT Serial1
 #define CFGPORT  Serial
-//#define MSP2CFG
+//#define MSP2CFG         // Duplicate MSP requests to CFGPORT
 #else
 #define	DATAPORT Serial
 #define CFGPORT  Serial

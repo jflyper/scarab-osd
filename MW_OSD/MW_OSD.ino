@@ -675,13 +675,14 @@ void resetFunc(void)
   asm volatile ("  jmp 0"); 
 #else
 
+// Should use some kind of AVR Arduino detector?
 #if defined(__AVR)
   asm volatile ("  jmp 0"); 
 #endif
 
-// Teensy 3 & LC
+#if defined(TEENSY3)
+// Teensy 3 (may be LC, too)
 // https://forum.pjrc.com/threads/19959-Detect-Teensy-3-C-preprocessor
-#if defined(__arm__) && defined(CORE_TEENSY)
 // Reset code: post#21 of
 // https://forum.pjrc.com/threads/24304-_reboot_Teensyduino()-vs-_restart_Teensyduino()
 #define CPU_RESTART_ADDR (uint32_t *)0xE000ED0C
@@ -689,7 +690,10 @@ void resetFunc(void)
 #define CPU_RESTART (*CPU_RESTART_ADDR = CPU_RESTART_VAL)
 
   CPU_RESTART;
-#endif // __arm__ && CORE_TEENSY
+
+  // Okay, this will reset/restart the CPU, but breaks the USB connection.
+  // Have to reconnect from GUI.
+#endif // TEENSY3
 
 #endif // ASMCLEANUP
 } 
