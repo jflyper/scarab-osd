@@ -113,6 +113,7 @@ void request_mavlink_rates(){
 
 
 void serialMAVCheck(){
+debug[1]++;
 #ifdef ALARM_MSP
   timer.MSP_active=ALARM_MSP; // getting valid MAV on serial port
 #endif //ALARM_MSP
@@ -257,6 +258,7 @@ void serialMAVreceive(uint8_t c)
     else
     {
       mav_state = MAV_IDLE;
+debug[3]++;
     } 
   }
   else if (mav_state == MAV_HEADER_START)
@@ -264,6 +266,7 @@ void serialMAVreceive(uint8_t c)
     mw_mav.message_length = c;
     mav_state = MAV_HEADER_LEN;
     if ((mav_payload_index) > SERIALBUFFERSIZE){  // too much data so reset check
+debug[2]++;
       mav_state = MAV_IDLE;
     }
   }

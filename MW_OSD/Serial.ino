@@ -992,6 +992,8 @@ void serialMSPreceive(uint8_t loops)
   {
     c = Serial.read();
 
+debug[0]++;
+
     #ifdef GPSOSD    
       armedtimer = 0;
       #if defined (NAZA)

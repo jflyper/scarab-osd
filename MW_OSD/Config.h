@@ -86,7 +86,7 @@
 /********************       TELEMETRY settings      *********************/
 //Select ONLY if you are sure your OSD is connected to a telemetry feed:
 //#define TELEMETRY_LTM             // Uncomment this if you are using a LTM telemetry feed (under development)
-//#define TELEMETRY_MAVLINK         // Uncomment this if you are using a MAVLINK telemetry feed (under development)
+#define TELEMETRY_MAVLINK         // Uncomment this if you are using a MAVLINK telemetry feed (under development)
 //#define TELEMETRY_SKYTRACK        // Under development
 //#define SETHOMEARMED              // Uncomment this to disable reset home position when arming. Use if FC armed data is sent via LTM
 //#define FORCE_MSP                 // Uncomment to enable use of MSP as well as telemetry. Uses more memory 
@@ -144,7 +144,7 @@
 /******************** Serial speed settings *********************/
 // Overides defaults if required (57.6k for MAVLINK based or 115k for all others). 
 //#define BAUDRATE 115200
-//#define BAUDRATE 57600
+#define BAUDRATE 57600
 //#define BAUDRATE 38400
 //#define BAUDRATE 19200
 //#define BAUDRATE 9600
