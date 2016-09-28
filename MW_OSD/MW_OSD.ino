@@ -107,7 +107,10 @@ uint16_t UntouchedStack(void)
 #include "WireUB.h"
 #endif
 
-char screen[480];      // Main screen ram for MAX7456
+char screen[480];          // Main screen ram for MAX7456
+#ifdef INVERTED_CHAR_SUPPORT
+uint8_t screenAttr[480/8]; // Attribute (INV) bits for each char in screen[]
+#endif
 char screenBuffer[20]; 
 uint32_t modeMSPRequests;
 uint32_t queuedMSPRequests;
@@ -495,6 +498,25 @@ void loop()
       {
         displayConfigScreen();
       }
+#ifdef CANVAS_MODE_SUPPORT
+      else if (canvasMode)
+      {
+        // In canvas mode, we don't actively write the screen; just listen to MSP stream.
+        if (lastCanvas + CANVAS_TIMO < currentMillis) {
+          MAX7456_ClearScreen();
+          canvasMode = false;
+        }
+
+        // Remember to throttle FC side code to reduce update frequency.
+
+        // XXX The very first debugging message.
+        static bool canvasFirst = true;
+        if (canvasFirst) {
+          MAX7456_WriteStringWithAttr("CANVAS MODE", (LINE03+04), 0);
+          canvasFirst = false;
+        }
+      }
+#endif
       else
       {
         setMspRequests();
