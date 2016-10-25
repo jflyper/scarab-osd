@@ -182,6 +182,7 @@ uint8_t cells=0;
 // Canvas mode
 #ifdef CANVAS_MODE_SUPPORT
 bool canvasMode = false;
+bool canvasFirst = true;
 uint32_t lastCanvas = 0;
 #define CANVAS_TIMO 2000  // Canvas mode timeout in msec.
 #endif

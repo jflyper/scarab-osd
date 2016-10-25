@@ -304,7 +304,11 @@ void loop()
   if((currentMillis - previous_millis_sync) >= sync_speed_cycle)  // (Executed > NTSC/PAL hz 33ms)
   {
     previous_millis_sync = previous_millis_sync+sync_speed_cycle;    
+#ifdef CANVAS_MODE_SUPPORT
+    if(!fontMode && !canvasMode)
+#else
     if(!fontMode)
+#endif
        #ifndef KISS
        mspWriteRequest(MSP_ATTITUDE,0);
        #endif
@@ -332,7 +336,11 @@ void loop()
     #endif    
     #ifndef GPSOSD 
       #ifdef MSP_SPEED_MED
+        #ifdef CANVAS_MODE_SUPPORT
+        if(!fontMode && !canvasMode){
+        #else
         if(!fontMode){
+        #endif
           #ifndef KISS
           mspWriteRequest(MSP_ATTITUDE,0);
           #endif // KISS
@@ -454,7 +462,10 @@ void loop()
        #ifdef KISS
        Serial.write(0x20);
        #else     
-       mspWriteRequest(MSPcmdsend, 0); 
+         #ifdef CANVAS_MODE_SUPPORT
+         if (!canvasMode)
+           mspWriteRequest(MSPcmdsend, 0); 
+         #endif
        #endif // KISS
       #endif //GPSOSD
       #ifdef SKYTRACK
@@ -509,10 +520,8 @@ void loop()
 
         // Remember to throttle FC side code to reduce update frequency.
 
-        // XXX The very first debugging message.
-        static bool canvasFirst = true;
         if (canvasFirst) {
-          MAX7456_WriteStringWithAttr("CANVAS MODE", (LINE03+04), 0);
+          MAX7456_WriteStringWithAttr("CANVAS MODE", (LINE02+02), 0);
           canvasFirst = false;
         }
       }

@@ -294,8 +294,8 @@ void serialMSPCheck()
 
   #ifdef CANVAS_MODE_SUPPORT
   if (cmdMSP == MSP_CANVAS) {
-    // Don't go into canvas mode when armed.
-    if (armed)
+    // Don't go into canvas mode when armed or in other special mode
+    if (armed || fontMode || configMode)
         return;
 /*
 Notes on MSP_CANVAS protocol
@@ -332,6 +332,7 @@ For sub-command 3 (draw string):
 
     case 1: // Exit canvas mode
       canvasMode = false;
+      canvasFirst = true;
       break;
 
     case 2: // Clear canvas
@@ -853,9 +854,13 @@ void handleRawRC() {
 
   if(!waitStick)
   {
-    //if((MwRcData[PITCHSTICK]>MAXSTICK)&&(MwRcData[YAWSTICK]>MAXSTICK)&&(MwRcData[THROTTLESTICK]>MINSTICK)){
-    if((MwRcData[PITCHSTICK]>MAXSTICK)&&(MwRcData[YAWSTICK]<MINSTICK)&&(MwRcData[THROTTLESTICK]>MINSTICK)){
+    if((MwRcData[PITCHSTICK]>MAXSTICK)&&(MwRcData[YAWSTICK]>MAXSTICK)&&(MwRcData[THROTTLESTICK]>MINSTICK)){
+    //if((MwRcData[PITCHSTICK]>MAXSTICK)&&(MwRcData[YAWSTICK]<MINSTICK)&&(MwRcData[THROTTLESTICK]>MINSTICK)){
+#ifdef CANVAS_MODE_SUPPORT
+      if (!configMode && (allSec > 5) && !armed && !canvasMode){
+#else
       if (!configMode&&(allSec>5)&&!armed){
+#endif
           // Enter config mode using stick combination
           waitStick =  2;	// Sticks must return to center before continue!
           configMode = 1;
