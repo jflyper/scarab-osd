@@ -947,10 +947,9 @@ void displayHeadingGraph(void)
   memcpy_P(screen+pos, headGraph+xx+1, 9);
 }
 
-
 void displayIntro(void)
 {
-  for(uint8_t X=0; X<=7; X++) {
+  for(uint8_t X=0; X<=INTRO_ITEM_COUNT; X++) {
     MAX7456_WriteString_P(PGMSTR(&(intro_item[X])), 64+(X*30));
   }
 #ifdef INTRO_CALLSIGN
@@ -958,6 +957,9 @@ void displayIntro(void)
 #endif
 #ifdef INTRO_SIGNALTYPE
   MAX7456_WriteString_P(PGMSTR(&(signal_type[flags.signaltype])), 64+(30*7)+4);
+#endif
+#ifdef INTRO_VTXINFO
+  displayVtxStatus(64+(30*8)+4);
 #endif
 #ifdef HAS_ALARMS
   if (alarmState != ALARM_OK) {
@@ -1424,6 +1426,20 @@ void displayCursor(void)
     screen[cursorpos] = SYM_CURSOR;
 }
 
+#ifdef USE_MENU_VTX
+void displayVtxStatus(int pos)
+{
+  if (configPage == MENU_VTX) {
+    char tmp[2];
+    tmp[0] = (char)pgm_read_byte(&vtxBandLetters[vtxBand]);
+    tmp[1] = 0;
+    MAX7456_WriteString(tmp, pos);
+    MAX7456_WriteString(itoa(vtxChannel + 1, screenBuffer, 10), pos + 2);
+    MAX7456_WriteString_P(PGMSTR(&(vtxPowerNames[vtxPower])), pos + 4);
+    MAX7456_WriteString(itoa((uint16_t)pgm_read_word(&vtx_frequencies[vtxBand][vtxChannel]), screenBuffer, 10), pos + 8);
+  }
+}
+#endif
 
 void displayConfigScreen(void)
 {
@@ -1796,7 +1812,7 @@ void displayConfigScreen(void)
     // Set
     MAX7456_WriteString("SET", ALTI);
 
-    updateVtxStatus();
+    displayVtxStatus(30 + 12);
   }
 #endif
 
@@ -1806,21 +1822,6 @@ void displayConfigScreen(void)
 
   displayCursor();
 }
-
-#ifdef USE_MENU_VTX
-void updateVtxStatus(void)
-{
-  if (configPage == MENU_VTX) {
-    char tmp[2];
-    tmp[0] = (char)pgm_read_byte(&vtxBandLetters[vtxBand]);
-    tmp[1] = 0;
-    MAX7456_WriteString(tmp, 12 + 30);
-    MAX7456_WriteString(itoa(vtxChannel + 1, screenBuffer, 10), 14 + 30);
-    MAX7456_WriteString_P(PGMSTR(&(vtxPowerNames[vtxPower])), 16 + 30);
-    MAX7456_WriteString(itoa((uint16_t)pgm_read_word(&vtx_frequencies[vtxBand][vtxChannel]), screenBuffer, 10), 20 + 30);
-  }
-}
-#endif
 
 void displayDebug(void)
 {

@@ -9,11 +9,12 @@
 
 // Display Debug screen display options
 //#define DEBUGMW            // Enable to display MSP debug values (assumes debug[x] values are not set elsewhere) 
-//#define DEBUG 4
+#define DEBUG 4
 //#define DEBUGDPOSRCDATA 264   // display RCDATA values at position X
 //#define DEBUGDPOSANAL 84     // display sensor values at position X
 //#define DEBUGDPOSPWM 264     // display PWM values at position X
 //#define DEBUGDPOSVAL 40      // display debug values at position X
+#define DEBUGDPOSVAL 264      // display debug values at position X
 //#define DEBUGDPOSLOOP 190    // display loop rate value at position X
 //#define DEBUGDPOSSAT 250     // display sat value at position X
 //#define DEBUGDPOSARMED 280   // display armed value at position X
@@ -41,10 +42,11 @@
 
 /********************  HARDWARE rule definitions  **********************/
 
-// VTX_RTC6705 Support for RTC6705 based VTX
-// VTX_RC      Support for SINGULARITY-style direct RC stick command
-// VTX_LED     Support for dedicated single status LED (not a LED strip support)
-// MENU_VTX    Support for VTX page in MWOSD MENU
+// VTX_RTC6705      Support for RTC6705 based VTX
+// VTX_RC           Support for SINGULARITY-style direct RC stick command
+// VTX_LED          Support for dedicated single status LED (not a LED strip support)
+// MENU_VTX         Support for VTX page in MWOSD MENU
+// INTRO_VTXINFO    Support for band/chan/freq/power displayed on opening
 
 #ifdef IMPULSERC_HELIX
   #define RUSHDUINO
@@ -52,6 +54,7 @@
   #define VTX_RC
   #define VTX_LED
   #define USE_MENU_VTX
+  #define INTRO_VTX_INFO
 #endif
 
 #ifdef FFPV_INNOVA
@@ -60,6 +63,7 @@
   //#define VTX_RC    // Can be turned on, hard to use without VTX_LED
   //#define VTX_LED   // Needs VTXLED_* definitions in RTC6705.ino
   #define USE_MENU_VTX
+  #define INTRO_VTX_INFO
 #endif
 
 /********************  CONTROLLER rule definitions  **********************/

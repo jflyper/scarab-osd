@@ -24,45 +24,6 @@
 # error Unknown VTX integrated board
 #endif
 
-void vtx_init() {
-
-  _pinModeOut(RTC_SPILE);
-  _pinModeOut(RTC_SPICLK);
-  _pinModeOut(RTC_SPIDATA);
-
-#ifdef IMPULSERC_HELIX
-  _pinModeOut(VTX_PSW1_PIN);
-  _pinModeOut(VTX_PSW2_PIN);
-#endif
-
-#ifdef VTX_LED
-  _pinModeOut(VTX_LED_PIN);
-#endif
-
-  // CS high
-  _digitalHi(RTC_SPILE);
-
-#ifdef IMPULSERC_HELIX
-  // Low output power
-  _digitalLo(VTX_PSW1_PIN);
-  _digitalLo(VTX_PSW2_PIN);
-#endif
-
-#ifdef VTX_LED
-  // LED off
-  _digitalHi(VTX_LED_PIN);
-#endif
-
-  vtxPower = Settings[S_VTX_POWER];
-  vtxBand = Settings[S_VTX_BAND];
-  vtxChannel = Settings[S_VTX_CHANNEL];
-
-  vtx_set_frequency(vtxBand, vtxChannel);
-
-#ifdef FFPV_INNOVA
-  vtx_set_power(vtxPower);
-#endif
-}
 
 
 void vtx_transfer(int reg, int rw, uint32_t data)
@@ -95,6 +56,7 @@ void vtx_transfer(int reg, int rw, uint32_t data)
 
 void vtx_set_power(uint8_t power)
 { 
+debug[2] = power + 1; // Distinguish from default zero
 #if defined(IMPULSERC_HELIX)
   switch (power) {
     case 0:
@@ -132,6 +94,8 @@ void vtx_set_power(uint8_t power)
 
 void vtx_set_frequency(uint8_t band, uint8_t channel)
 {
+debug[0] = band;
+debug[1] = channel;
   uint16_t frequency = pgm_read_word(&vtx_frequencies[band][channel]);
   
   uint32_t N = 0;
@@ -200,6 +164,45 @@ void vtx_process_state(uint32_t currentMillis, uint8_t band, uint8_t channel)
   wasPowered = reading;
 }
 #endif
+
+void vtx_init() {
+
+  _pinModeOut(RTC_SPILE);
+  _pinModeOut(RTC_SPICLK);
+  _pinModeOut(RTC_SPIDATA);
+
+#ifdef IMPULSERC_HELIX
+  _pinModeOut(VTX_PSW1_PIN);
+  _pinModeOut(VTX_PSW2_PIN);
+#endif
+
+#ifdef VTX_LED
+  _pinModeOut(VTX_LED_PIN);
+#endif
+
+  // CS high
+  _digitalHi(RTC_SPILE);
+
+#ifdef IMPULSERC_HELIX
+  // Low output power
+  vtx_set_power(0);
+#endif
+
+#ifdef VTX_LED
+  // LED off
+  _digitalHi(VTX_LED_PIN);
+#endif
+
+  vtxPower = Settings[S_VTX_POWER];
+  vtxBand = Settings[S_VTX_BAND];
+  vtxChannel = Settings[S_VTX_CHANNEL];
+
+  vtx_set_frequency(vtxBand, vtxChannel);
+
+#ifdef FFPV_INNOVA
+  vtx_set_power(vtxPower);
+#endif
+}
 
 #if 0 // XXX Not currently used
 void vtx_save(){

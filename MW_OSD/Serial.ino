@@ -1049,7 +1049,7 @@ void serialMenuCommon()
             vtx_set_power(vtxPower);
           }
 
-          updateVtxStatus();
+          displayVtxStatus(30 + 12);
         }
         break;
     }

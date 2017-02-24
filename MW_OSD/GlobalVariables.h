@@ -948,6 +948,7 @@ const char introtext2[]  PROGMEM = "    +YAW RIGHT";
 const char introtext3[]  PROGMEM = "    +PITCH FULL";
 const char introtext4[]  PROGMEM = "ID:";
 const char introtext5[]  PROGMEM = "SI:";
+const char introtext6[]  PROGMEM = "VTX:";
 const char introtextblank[]  PROGMEM = "";
 
 // Intro
@@ -975,7 +976,14 @@ const PROGMEM char * const intro_item[] =
 #else
   introtextblank,
 #endif
+#ifdef INTRO_VTXINFO
+  introtext6,
+#else
+  introtextblank,
+#endif
 };
+
+#define INTRO_ITEM_COUNT (sizeof(intro_item)/sizeof(char *))
 
 #ifdef AUTOCAM 
 const char signaltext0[]  PROGMEM = "AUTO-NTSC";
