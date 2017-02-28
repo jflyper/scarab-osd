@@ -9,12 +9,12 @@
 
 // Display Debug screen display options
 //#define DEBUGMW            // Enable to display MSP debug values (assumes debug[x] values are not set elsewhere) 
-#define DEBUG 4
+#define DEBUG 1              // 4 = Clear screen before display debug
 //#define DEBUGDPOSRCDATA 264   // display RCDATA values at position X
 //#define DEBUGDPOSANAL 84     // display sensor values at position X
 //#define DEBUGDPOSPWM 264     // display PWM values at position X
 //#define DEBUGDPOSVAL 40      // display debug values at position X
-#define DEBUGDPOSVAL 264      // display debug values at position X
+#define DEBUGDPOSVAL 260      // display debug values at position X
 //#define DEBUGDPOSLOOP 190    // display loop rate value at position X
 //#define DEBUGDPOSSAT 250     // display sat value at position X
 //#define DEBUGDPOSARMED 280   // display armed value at position X

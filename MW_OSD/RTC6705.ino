@@ -28,6 +28,7 @@
 
 void vtx_transfer(int reg, int rw, uint32_t data)
 {
+debug[3] = data;
   uint32_t regdata = (reg << 0)|(rw << 4)|(data << 5);
   uint32_t mask = 1;
 
@@ -104,13 +105,12 @@ debug[1] = channel;
   uint8_t i = 0;
   if (frequency <5956 && frequency> 5644)
   {
-    vtx_transfer(0, 1, 400);
-    
     N = ((uint32_t) frequency * 25) / 64;
     A = ((uint32_t) frequency * 25 - N * 64);
 
     data = (A & 0x7F) | ((N & 0x1FFF) << 7);
 
+    vtx_transfer(0, 1, 400);
     vtx_transfer(1, 1, data);
   }
 }

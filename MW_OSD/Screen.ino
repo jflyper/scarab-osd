@@ -1826,22 +1826,29 @@ void displayConfigScreen(void)
 void displayDebug(void)
 {
 #if defined (DEBUG)
+  bool clearScreen = false;
 
   switch(DEBUG) {
-    case 4:
+    case 1:
       break;
+
+    case 4:
+      clearScreen = true;
+      break;
+
     default:
       if (screenlayout!=DEBUG)
         return;
+      clearScreen = true;
       break;  
   }
 
-#if 0
- for(uint16_t xx=0;xx<MAX_screen_size;++xx){ // clear screen
-   screen[xx] = ' ';
- }
-#endif
- 
+  if (clearScreen) {
+    for(uint16_t xx=0;xx<MAX_screen_size;++xx) { // clear screen
+      screen[xx] = ' ';
+    }
+  }
+
 #ifdef DEBUGDPOSRCDATA
   MAX7456_WriteString("RC",DEBUGDPOSRCDATA);
   for(uint8_t X=1; X<=8; X++) {
